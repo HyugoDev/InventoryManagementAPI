@@ -1,12 +1,15 @@
 package com.inventory.management.service.impl;
 
 import com.inventory.management.dto.category.CategoryCreateDto;
+import com.inventory.management.dto.category.CategoryResponseDto;
 import com.inventory.management.exception.ResourceNotFoundException;
+import com.inventory.management.mapper.CategoryMapper;
 import com.inventory.management.model.Category;
 import com.inventory.management.repository.CategoryRepository;
 import com.inventory.management.service.CategoryService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,36 +21,38 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryRepository categoryRepository;
 
     @Override
-    public Category create(CategoryCreateDto data){
-        return categoryRepository.save(
+    @Transactional
+    public CategoryResponseDto create(CategoryCreateDto data){
+        return CategoryMapper.toDto(
+                categoryRepository.save(
                 Category.builder()
                         .name(data.getName())
                         .build()
+        ));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoryResponseDto> getAll() {
+        return categoryRepository.findAll()
+                .stream()
+                .map(CategoryMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Category getById(Long id){
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id " + id)
         );
     }
 
     @Override
-    public boolean existebyId(Long id){
-        return categoryRepository.existsById(id);
-    }
-
-    @Override
-    public Category findById(Long id) {
-      return categoryRepository.findById(id)
-              .orElseThrow(()-> new ResourceNotFoundException("Category not found " + id ));
-    }
-
-    @Override
-    public List<Category> findAll() {
-        return categoryRepository.findAll();
-    }
-
-    @Override
+    @Transactional
     public void delete(Long id) {
-        if (categoryRepository.findById(id).isEmpty()) {
-            throw  new ResourceNotFoundException("Category not found " + id );
-        }
-        categoryRepository.deleteById(id);
+        Category category = getById(id);
+        categoryRepository.delete(category);
     }
 
 }

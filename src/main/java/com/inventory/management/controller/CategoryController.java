@@ -2,6 +2,7 @@ package com.inventory.management.controller;
 
 
 import com.inventory.management.dto.category.CategoryCreateDto;
+import com.inventory.management.dto.category.CategoryResponseDto;
 import com.inventory.management.model.Category;
 import com.inventory.management.service.CategoryService;
 import jakarta.validation.Valid;
@@ -18,13 +19,13 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<Category> createCategory(@RequestBody @Valid CategoryCreateDto category) {
+    public ResponseEntity<CategoryResponseDto> createCategory(@Valid @RequestBody CategoryCreateDto category) {
         return ResponseEntity.ok(categoryService.create(category));
     }
 
     @GetMapping
-    public ResponseEntity<List<Category>> getAll() {
-        return ResponseEntity.ok(categoryService.findAll());
+    public ResponseEntity<List<CategoryResponseDto>> getAll() {
+        return ResponseEntity.ok(categoryService.getAll());
     }
 
 

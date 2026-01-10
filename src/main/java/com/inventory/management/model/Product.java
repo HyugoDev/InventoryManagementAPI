@@ -2,7 +2,6 @@ package com.inventory.management.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.math.BigDecimal;
 
 @Entity
@@ -14,7 +13,6 @@ import java.math.BigDecimal;
 @Builder
 
 public class Product {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,14 +1,14 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   application:
     name: Inventory Management API
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/inventory
-    username: hyugodev
-    password: 7166
+    url: jdbc:postgresql://localhost:5433/db_inventorymanagement
+    username: postgres
+    password: kuvmG2dSTdV0oJ3aJxGA0POiSweGJjEtrCtz5upK822ndYJfBFcKw6ntb1QT4FN9
     driver-class-name: org.postgresql.Driver
 
   jpa:

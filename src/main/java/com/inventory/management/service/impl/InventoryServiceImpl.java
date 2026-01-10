@@ -1,12 +1,17 @@
 package com.inventory.management.service.impl;
 
+import com.inventory.management.dto.inventory.InventoryCreateDto;
+import com.inventory.management.dto.inventory.InventoryResponseDto;
 import com.inventory.management.exception.ResourceNotFoundException;
+import com.inventory.management.mapper.InventoryMapper;
 import com.inventory.management.model.Category;
 import com.inventory.management.model.Inventory;
 import com.inventory.management.repository.InventoryRepository;
 import com.inventory.management.service.InventoryService;
+import com.inventory.management.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,11 +19,19 @@ import java.util.List;
 @AllArgsConstructor
 public class InventoryServiceImpl implements InventoryService {
     private InventoryRepository inventoryRepository;
+    private ProductService productService;
 
 
     @Override
-    public Inventory create(Inventory inventory) {
-        return inventoryRepository.save(inventory);
+    public InventoryResponseDto create(InventoryCreateDto inventory) {
+        return InventoryMapper.toDto(
+                inventoryRepository.save(
+                        Inventory.builder()
+                                .product(productService.getEntityById(inventory.getProductId()))
+                                .quantity(inventory.getQuantity())
+                                .build()
+                )
+        );
     }
 
     @Override
@@ -39,14 +52,18 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public Inventory findById(Long inventoryId) {
+    public Inventory getById(Long inventoryId) {
         return inventoryRepository.findById(inventoryId)
                 .orElseThrow(()-> new ResourceNotFoundException("Inventory not found " + inventoryId ));
     }
 
     @Override
-    public List<Inventory> findAll() {
-       return inventoryRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<InventoryResponseDto> getAll() {
+       return inventoryRepository.findAll()
+                       .stream()
+                       .map(InventoryMapper::toDto)
+                       .toList();
     }
 
     @Override

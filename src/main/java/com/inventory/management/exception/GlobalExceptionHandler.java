@@ -5,12 +5,11 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 
-@ControllerAdvice
+@SuppressWarnings("JvmTaintAnalysis")
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -20,13 +19,7 @@ public class GlobalExceptionHandler {
             ResourceNotFoundException ex,
             HttpServletRequest request) {
 
-        ApiError error = new ApiError(
-                HttpStatus.NOT_FOUND.value(),
-                ex.getMessage(),
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
     // 400 — Error de negocio / argumento inválido
@@ -35,16 +28,11 @@ public class GlobalExceptionHandler {
             IllegalArgumentException ex,
             HttpServletRequest request) {
 
-        ApiError error = new ApiError(
-                HttpStatus.BAD_REQUEST.value(),
-                ex.getMessage(),
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.badRequest().body(error);
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
     // 400 — Validaciones @Valid
+    @SuppressWarnings("JvmTaintAnalysis")
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidation(
             MethodArgumentNotValidException ex,
@@ -57,13 +45,9 @@ public class GlobalExceptionHandler {
                 .findFirst()
                 .orElse("Validation error");
 
-        ApiError error = new ApiError(
-                HttpStatus.BAD_REQUEST.value(),
-                message,
-                request.getRequestURI()
-        );
 
-        return ResponseEntity.badRequest().body(error);
+
+        return buildError(HttpStatus.NOT_FOUND, message, request);
     }
 
     // 500 — Error inesperado
@@ -72,13 +56,19 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request) {
 
-        ApiError error = new ApiError(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Unexpected server error",
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
+    private ResponseEntity<ApiError> buildError(
+            HttpStatus status,
+            String message,
+            HttpServletRequest request
+    ) {
+        return ResponseEntity.status(status)
+                .body(new ApiError(
+                        status.value(),
+                        message,
+                        request.getRequestURI()
+                ));
+    }
 }

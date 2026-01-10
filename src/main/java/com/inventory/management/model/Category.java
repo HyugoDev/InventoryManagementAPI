@@ -1,6 +1,5 @@
 package com.inventory.management.model;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
@@ -11,7 +10,6 @@ import lombok.*;
 @Builder
 
 public class Category {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

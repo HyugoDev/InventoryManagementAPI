@@ -1,16 +1,16 @@
 package com.inventory.management.service;
 
 import com.inventory.management.dto.category.CategoryCreateDto;
+import com.inventory.management.dto.category.CategoryResponseDto;
 import com.inventory.management.model.Category;
 
 import java.util.List;
 
 public interface CategoryService {
-    Category create(CategoryCreateDto category);
+    CategoryResponseDto create(CategoryCreateDto category);
 
-    boolean existebyId(Long id);
+    List<CategoryResponseDto> getAll();
+    Category getById(Long id);
 
-    Category findById(Long id);
-    List<Category> findAll();
     void delete(Long id);
 }
