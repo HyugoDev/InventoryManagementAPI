@@ -26,3 +26,7 @@ spring:
   Jackson:
     serialization:
       fail-on-empty-beans: false
+
+logging:
+  level:
+    org.springframework.jdbc.datasource: DEBUG
