@@ -1,73 +1,67 @@
 package com.inventory.management.service.impl;
 
-import com.inventory.management.dto.inventory.InventoryCreateDto;
-import com.inventory.management.dto.inventory.InventoryResponseDto;
+
+import com.inventory.management.dto.request.InventoryRequest;
+import com.inventory.management.dto.response.InventoryResponse;
 import com.inventory.management.exception.ResourceNotFoundException;
 import com.inventory.management.mapper.InventoryMapper;
-import com.inventory.management.model.Category;
-import com.inventory.management.model.Inventory;
-import com.inventory.management.repository.InventoryRepository;
+import com.inventory.management.model.InventoryItem;
+import com.inventory.management.model.Product;
+import com.inventory.management.repository.InventoryItemRepository;
+import com.inventory.management.repository.ProductRepository;
 import com.inventory.management.service.InventoryService;
-import com.inventory.management.service.ProductService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Slf4j
 public class InventoryServiceImpl implements InventoryService {
-    private InventoryRepository inventoryRepository;
-    private ProductService productService;
+
+    private final InventoryItemRepository inventoryRepository;
+    private final ProductRepository productRepository;
+    private final InventoryMapper mapper;
 
 
     @Override
-    public InventoryResponseDto create(InventoryCreateDto inventory) {
-        return InventoryMapper.toDto(
-                inventoryRepository.save(
-                        Inventory.builder()
-                                .product(productService.getEntityById(inventory.getProductId()))
-                                .quantity(inventory.getQuantity())
-                                .build()
-                )
-        );
+    public InventoryResponse addStock(InventoryRequest request) {
+        Long productId = Long.valueOf(request.productId());
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado"));
+        InventoryItem item = mapper.toEntity(request);
+        item.setProduct(product);
+        log.info("Actualizando inventario para el producto: {}", product.getName());
+        return mapper.toDto(inventoryRepository.save(item));
     }
 
     @Override
-    public Inventory update(Inventory inventory) {
-        if (inventoryRepository.findById(inventory.getId()).isEmpty()) {
-            throw  new ResourceNotFoundException("Inventory not found");
-        }
-
-        return inventoryRepository.save(inventory);
+    public InventoryResponse getById(Long inventoryId) {
+        return null;
     }
 
     @Override
-    public void delete(Long inventoryId) {
-        if (inventoryRepository.findById(inventoryId).isEmpty()) {
-            throw  new ResourceNotFoundException("Inventory not found " + inventoryId );
-        }
-        inventoryRepository.deleteById(inventoryId);
-    }
+    public InventoryResponse updateQuantity(Long id, Integer quantity) {
+        InventoryItem item = inventoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Item de inventario no encontrado"));
 
-    @Override
-    public Inventory getById(Long inventoryId) {
-        return inventoryRepository.findById(inventoryId)
-                .orElseThrow(()-> new ResourceNotFoundException("Inventory not found " + inventoryId ));
+        item.setQuantity(quantity);
+
+        return mapper.toDto(inventoryRepository.save(item));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<InventoryResponseDto> getAll() {
+    public List<InventoryResponse> findAll() {
        return inventoryRepository.findAll()
                        .stream()
-                       .map(InventoryMapper::toDto)
+                       .map(mapper::toDto)
                        .toList();
     }
 
-    @Override
-    public List<Inventory> findByCategory(Category category) {
-       return inventoryRepository.findByProductCategory(category);
-    }
+
 }

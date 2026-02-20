@@ -24,6 +24,11 @@ spring:
     serialization:
       fail-on-empty-beans: false
 
+# Configuración de logs para auditoría
 logging:
   level:
     org.springframework.jdbc.datasource: DEBUG
+    root: INFO
+    com.inventory.management: DEBUG
+  file:
+    name: logs/inventory-app.log

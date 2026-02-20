@@ -3,14 +3,9 @@ package com.inventory.management.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
-@Table(name = "inventories")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Inventory {
+@Getter @Setter @NoArgsConstructor @Entity
+@Table(name = "inventory_items")
+public class InventoryItem extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,5 +15,10 @@ public class Inventory {
     private Product product;
 
     @Column(nullable = false)
-    private int quantity;
+    private Integer quantity;
+
+    @Column(name = "min_stock")
+    private Integer minStock;
+
+    private String location;
 }
