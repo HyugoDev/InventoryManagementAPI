@@ -2,20 +2,27 @@ package com.inventory.management.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
-@Table(name = "categories")
-@Getter @Setter
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-
-public class Category {
+@Entity
+@Table(name = "categories")
+public class Category extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
+
+    private String description;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<Product> products;
+
 
 }

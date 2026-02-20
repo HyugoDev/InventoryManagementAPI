@@ -1,16 +1,20 @@
 package com.inventory.management.service;
 
-import com.inventory.management.dto.category.CategoryCreateDto;
-import com.inventory.management.dto.category.CategoryResponseDto;
-import com.inventory.management.model.Category;
+
+import com.inventory.management.dto.request.CategoryRequest;
+import com.inventory.management.dto.response.CategoryResponse;
+import org.springframework.data.domain.Page;
+
 
 import java.util.List;
 
 public interface CategoryService {
-    CategoryResponseDto create(CategoryCreateDto category);
+    List<CategoryResponse> findAll();
+    CategoryResponse save(CategoryRequest category);
 
-    List<CategoryResponseDto> getAll();
-    Category getById(Long id);
+    List<CategoryResponse> search(String search);
+
+    CategoryResponse getById(Long id);
 
     void delete(Long id);
 }

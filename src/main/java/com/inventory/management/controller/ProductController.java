@@ -1,40 +1,49 @@
 package com.inventory.management.controller;
 
-
-import com.inventory.management.dto.product.ProductCreateDto;
-import com.inventory.management.dto.product.ProductResponseDto;
+import com.inventory.management.dto.request.ProductRequest;
+import com.inventory.management.dto.response.ProductResponse;
 import com.inventory.management.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
+@Validated
 public class ProductController {
     private final ProductService productService;
 
-    @PostMapping
-    public ResponseEntity<ProductResponseDto> createProduct(@Valid @RequestBody ProductCreateDto product) {
-        return ResponseEntity.ok(productService.create(product));
+    @GetMapping
+    public ResponseEntity<List<ProductResponse>> getAll() {
+        List<ProductResponse> products = productService.findAll();
+        return products.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(products);
     }
 
-    @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductResponse create(@Valid @RequestBody ProductRequest request) {
+        return productService.save(request);
     }
+
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponseDto> getProductById(@Valid @PathVariable Long id) {
-        return ResponseEntity.ok(productService.getById(id));
+    public ResponseEntity<ProductResponse> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.findById(id));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProductById(@Valid @PathVariable Long id) {
-        productService.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }
+
+
+
+
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deleteProductById(@Valid @PathVariable Long id) {
+//        productService.deleteById(id);
+//        return ResponseEntity.noContent().build();
+//    }
 }

@@ -1,11 +1,18 @@
 package com.inventory.management.mapper;
 
+import com.inventory.management.dto.request.InventoryRequest;
+import com.inventory.management.dto.response.InventoryResponse;
+import com.inventory.management.model.InventoryItem;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-import com.inventory.management.dto.inventory.InventoryResponseDto;
-import com.inventory.management.model.Inventory;
+@Mapper(componentModel = "spring")
+public interface InventoryMapper {
+    @Mapping(source = "product.id", target = "productId")
+    @Mapping(source = "product.name", target = "productName")
+    InventoryResponse toDto(InventoryItem item);
 
-public class InventoryMapper {
-    public static InventoryResponseDto toDto(Inventory inventory) {
-        return new InventoryResponseDto(inventory.getId(), inventory.getProduct(), inventory.getQuantity());
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "product", ignore = true) // Se busca en el Service por ID
+    InventoryItem toEntity(InventoryRequest request);
 }
