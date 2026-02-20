@@ -38,7 +38,7 @@
 
             configuration.setAllowedOrigins(Arrays.asList(
                     "http://localhost:4321",
-                    "https://web-inventario.hyugodev.me"
+                    "https://inventario.hyugodev.me"
             ));
 
             configuration.setAllowedMethods(Arrays.asList(
